@@ -3,12 +3,12 @@ import { ApolloServer } from "apollo-server-express";
 import * as express from "express";
 import { buildSchema } from "type-graphql";
 import { dbConnect } from "./config/dbConnent";
-import { CategoryResolver } from "./resolvers";
+import { CategoryResolver, ItemResovler } from "./resolvers";
 
 const main = async () => {
   dbConnect();
   const schema = await buildSchema({
-    resolvers: [CategoryResolver]
+    resolvers: [CategoryResolver, ItemResovler]
   });
 
   const apolloServer = new ApolloServer({ schema });

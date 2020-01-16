@@ -1,13 +1,22 @@
 import { Resolver, Query, Mutation, Arg } from "type-graphql";
 import { Category, CategorySchema, Item } from "../models";
 import { checkIfCategoryExist } from "../utils";
+import { DELETE_MESSAGE } from "../config/messages";
 
 @Resolver()
 export class CategoryResolver {
+  @Query(() => [CategorySchema])
+  async getAllCategories(): Promise<CategorySchema[]> {
+    try {
+      return await Category.find({}).populate("items");
+    } catch (err) {
+      throw new Error(err.message);
+    }
+  }
+
   // getCategoryWithItems Query
   // PARAM: categoryID - categoryID
   // Validation: Check if category exist
-
   @Query(() => CategorySchema)
   async getCategoryWithItems(
     @Arg("categoryID") categoryId: string
@@ -17,8 +26,8 @@ export class CategoryResolver {
 
       const populatedCategory = await category.populate("items").execPopulate();
       return populatedCategory;
-    } catch (error) {
-      throw new Error(error.message);
+    } catch (err) {
+      throw new Error(err.message);
     }
   }
 
@@ -55,7 +64,7 @@ export class CategoryResolver {
   async addItemToCategory(
     @Arg("itemName") itemName: string,
     @Arg("categoryId") categoryId: string
-  ): Promise<CategorySchema> {
+  ): Promise<CategorySchema | Boolean> {
     try {
       const category = await checkIfCategoryExist(categoryId);
 
@@ -67,13 +76,35 @@ export class CategoryResolver {
 
       const newItem = new Item({ itemName });
 
-      category.items.push(newItem.id);
+      category.items.unshift(newItem.id);
 
       await newItem.save();
       await category.save();
 
       const populatedCategory = await category.populate("items").execPopulate();
       return populatedCategory;
+    } catch (err) {
+      throw new Error(err.message);
+    }
+  }
+
+  // deleteCategory Mutation
+  // PARAM: categoryId
+  // Validation: Check if category exist
+  @Mutation(() => Boolean)
+  async deleteCategory(
+    @Arg("categoryId") categoryId: string
+  ): Promise<Boolean> {
+    try {
+      const category = await checkIfCategoryExist(categoryId, DELETE_MESSAGE);
+
+      await category.remove(err => {
+        if (err) {
+          throw new Error("Category delete error");
+        }
+      });
+
+      return true;
     } catch (err) {
       throw new Error(err.message);
     }

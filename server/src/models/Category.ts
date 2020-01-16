@@ -1,7 +1,21 @@
-import { prop, getModelForClass, Ref, arrayProp } from "@typegoose/typegoose";
+import {
+  prop,
+  getModelForClass,
+  Ref,
+  arrayProp,
+  post
+} from "@typegoose/typegoose";
 import { Field, ObjectType } from "type-graphql";
-import { ItemSchema } from "./Item";
+import { ItemSchema, Item } from "./Item";
 
+@post<CategorySchema>("remove", async function(item) {
+  console.log("START");
+  item.items.map(async el => {
+    let item = await Item.findById(el);
+    item?.remove();
+  });
+  console.log("DELETED");
+})
 @ObjectType()
 export class CategorySchema {
   @Field()
