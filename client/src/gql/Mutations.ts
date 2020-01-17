@@ -12,3 +12,16 @@ export const ADD_ITEM_TO_CATEGORY = gql`
     }
   }
 `;
+
+export const CREATE_CATEGORY = gql`
+  mutation createCategory($categoryName: String!) {
+    createCategory(categoryName: $categoryName) {
+      categoryName
+      _id
+      items {
+        _id
+        itemName
+      }
+    }
+  }
+`;

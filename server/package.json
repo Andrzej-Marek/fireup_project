@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node src/index.ts",
-    "dev": "nodemon --exec ts-node src/index.ts"
+    "dev": "nodemon --exec ts-node src/index.ts",
+    "start-both": "concurrently \"cd .. && cd client && npm start\" \"npm start\""
   },
   "keywords": [],
   "author": "",
@@ -15,6 +16,7 @@
     "@types/graphql": "^14.5.0",
     "@types/mongoose": "^5.5.41",
     "@types/node": "^13.1.7",
+    "concurrently": "^5.0.2",
     "nodemon": "^2.0.2",
     "ts-node": "^8.6.2",
     "typescript": "^3.7.4"

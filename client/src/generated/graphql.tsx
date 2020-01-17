@@ -91,6 +91,23 @@ export type AddItemToCategoryMutation = (
   ) }
 );
 
+export type CreateCategoryMutationVariables = {
+  categoryName: Scalars['String']
+};
+
+
+export type CreateCategoryMutation = (
+  { __typename?: 'Mutation' }
+  & { createCategory: (
+    { __typename?: 'CategorySchema' }
+    & Pick<CategorySchema, 'categoryName' | '_id'>
+    & { items: Array<(
+      { __typename?: 'ItemSchema' }
+      & Pick<ItemSchema, '_id' | 'itemName'>
+    )> }
+  ) }
+);
+
 export type GetAllCategoriesQueryVariables = {};
 
 
@@ -139,6 +156,38 @@ export function withAddItemToCategory<TProps, TChildProps = {}>(operationOptions
 };
 export type AddItemToCategoryMutationResult = ApolloReactCommon.MutationResult<AddItemToCategoryMutation>;
 export type AddItemToCategoryMutationOptions = ApolloReactCommon.BaseMutationOptions<AddItemToCategoryMutation, AddItemToCategoryMutationVariables>;
+export const CreateCategoryDocument = gql`
+    mutation createCategory($categoryName: String!) {
+  createCategory(categoryName: $categoryName) {
+    categoryName
+    _id
+    items {
+      _id
+      itemName
+    }
+  }
+}
+    `;
+export type CreateCategoryMutationFn = ApolloReactCommon.MutationFunction<CreateCategoryMutation, CreateCategoryMutationVariables>;
+export type CreateCategoryComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<CreateCategoryMutation, CreateCategoryMutationVariables>, 'mutation'>;
+
+    export const CreateCategoryComponent = (props: CreateCategoryComponentProps) => (
+      <ApolloReactComponents.Mutation<CreateCategoryMutation, CreateCategoryMutationVariables> mutation={CreateCategoryDocument} {...props} />
+    );
+    
+export type CreateCategoryProps<TChildProps = {}> = ApolloReactHoc.MutateProps<CreateCategoryMutation, CreateCategoryMutationVariables> & TChildProps;
+export function withCreateCategory<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  CreateCategoryMutation,
+  CreateCategoryMutationVariables,
+  CreateCategoryProps<TChildProps>>) {
+    return ApolloReactHoc.withMutation<TProps, CreateCategoryMutation, CreateCategoryMutationVariables, CreateCategoryProps<TChildProps>>(CreateCategoryDocument, {
+      alias: 'createCategory',
+      ...operationOptions
+    });
+};
+export type CreateCategoryMutationResult = ApolloReactCommon.MutationResult<CreateCategoryMutation>;
+export type CreateCategoryMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateCategoryMutation, CreateCategoryMutationVariables>;
 export const GetAllCategoriesDocument = gql`
     query getAllCategories {
   getAllCategories {

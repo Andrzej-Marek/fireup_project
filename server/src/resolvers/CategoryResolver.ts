@@ -40,7 +40,7 @@ export class CategoryResolver {
   ): Promise<CategorySchema> {
     try {
       if (!categoryName.trim()) {
-        throw new Error("You have to pass category Name");
+        throw new Error("You have to pass category name");
       }
 
       const category = await Category.findOne({ categoryName });
@@ -71,7 +71,7 @@ export class CategoryResolver {
       const item = await Item.findOne({ itemName });
 
       if (item && category.items.includes(item.id)) {
-        throw new Error("This item is already in db");
+        throw new Error(`Item ${item.itemName} is already in this category`);
       }
 
       const newItem = new Item({ itemName });

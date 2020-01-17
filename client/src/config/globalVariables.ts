@@ -1,0 +1,1 @@
+export const MODAL_BACKDROP_SHOW_DOWN_TIME = 500;

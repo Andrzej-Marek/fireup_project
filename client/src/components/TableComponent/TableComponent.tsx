@@ -1,39 +1,40 @@
-import React, { useState, useCallback } from "react";
-import styled from "styled-components";
-import TableRow from "./TableRow";
-import { useQuery, useMutation } from "@apollo/react-hooks";
-import { GET_ALL_CATEGORIES } from "gql";
-import { LoadingComponent } from "MultiUse";
-import { ADD_ITEM_TO_CATEGORY } from "gql/Mutations";
+import { useMutation, useQuery } from "@apollo/react-hooks";
+import AbsoluteAddButton from "components/Buttons/AbsoluteAddButton";
+import AddCategoryModal from "components/Modals/AddCategoryModal";
 import {
-  AddItemToCategoryMutation,
-  GetAllCategoriesQuery,
-  CategorySchema
+  CategorySchema,
+  CreateCategoryMutation,
+  GetAllCategoriesQuery
 } from "generated/graphql";
+import { GET_ALL_CATEGORIES } from "gql";
+import { CREATE_CATEGORY } from "gql/Mutations";
+import { LoadingComponent } from "MultiUse";
 import ErrorShowComponent from "MultiUse/ErrorShowComponent";
-import { ExecutionResult } from "graphql";
+import React, { useState } from "react";
+import styled from "styled-components";
+import TableCol from "./TableCol";
+import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 
+export interface IStatusPopUp {
+  status: boolean;
+  message: string;
+  show: boolean;
+}
 const TableComponent: React.FC = () => {
-  const [statusPopUp, setStatusPopUp] = useState({
+  const [statusPopUp, setStatusPopUp] = useState<IStatusPopUp>({
     status: false,
     message: "",
     show: false
   });
-
-  const { status, message, show } = statusPopUp;
+  const [addCategoryModal, toggleAddCategoryModal] = useState(false);
 
   const { loading, data } = useQuery<GetAllCategoriesQuery>(GET_ALL_CATEGORIES);
-  const [addItemToCategory] = useMutation<AddItemToCategoryMutation>(
-    ADD_ITEM_TO_CATEGORY,
-    {
-      variables: { categoryId: "5e201a945a220b064f080a07", itemName: "Hello4" }
-    }
-  );
+  const [addCategory] = useMutation<CreateCategoryMutation>(CREATE_CATEGORY);
 
   const resetStatusPopUp = () =>
     setStatusPopUp(prevState => ({ ...prevState, show: false }));
 
-  const deleteItem = (id: string) => {
+  const deleteHandler = (type: string, id: string) => {
     setStatusPopUp({
       message: "Delete success",
       status: true,
@@ -41,9 +42,42 @@ const TableComponent: React.FC = () => {
     });
   };
 
-  const addItemToCategoryFunction = async () => {
+  const displayTableCols = (array: CategorySchema[]) =>
+    array.map(({ categoryName, items, _id }) => (
+      <TableCol
+        key={_id}
+        deleteItem={deleteHandler}
+        itemsArray={items}
+        categoryName={categoryName}
+        categoryId={_id}
+        setStatusPopUp={setStatusPopUp}
+      />
+    ));
+
+  const createNewCategory = async (categoryName: string) => {
     try {
-      await addItemToCategory();
+      await addCategory({
+        variables: { categoryName },
+        update: async (cache, { data }) => {
+          try {
+            let queryData = cache.readQuery<GetAllCategoriesQuery>({
+              query: GET_ALL_CATEGORIES
+            });
+
+            cache.writeQuery<GetAllCategoriesQuery>({
+              query: GET_ALL_CATEGORIES,
+              data: {
+                getAllCategories: [
+                  ...queryData!.getAllCategories,
+                  data!.createCategory
+                ]
+              }
+            });
+          } catch (e) {
+            console.log(e.message);
+          }
+        }
+      });
     } catch (error) {
       setStatusPopUp({
         message: error.graphQLErrors[0].message,
@@ -53,25 +87,41 @@ const TableComponent: React.FC = () => {
     }
   };
 
-  const displayTableRows = (array: CategorySchema[]) =>
-    array.map(el => (
-      <TableRow
-        key={el._id}
-        addItemToArray={addItemToCategoryFunction}
-        deleteItem={deleteItem}
-        itemsArray={el.items}
-        categoryName={el.categoryName}
-      />
-    ));
-
   if (!data || loading) {
     return <LoadingComponent />;
   }
 
+  if (data.getAllCategories.length === 0) {
+    return (
+      <>
+        <h1>You don't have any categories, add one</h1>
+        <AbsoluteAddButton
+          title="Create new category"
+          onClickFunction={() => toggleAddCategoryModal(true)}
+        />
+        <AddCategoryModal
+          open={addCategoryModal}
+          toggle={() => toggleAddCategoryModal(!addCategoryModal)}
+          onSubmit={categoryName => createNewCategory(categoryName)}
+        />
+      </>
+    );
+  }
+
+  const { status, message, show } = statusPopUp;
   return (
     <Wrapper>
-      <TableWrapper>{displayTableRows(data.getAllCategories)}</TableWrapper>
-      {/* <Table data={data} addItemToCategory={addItemToCategory} /> */}
+      <DeleteForeverIcon onClick={() => deleteHandler("Category", "123232")} />
+      <TableWrapper>{displayTableCols(data.getAllCategories)}</TableWrapper>
+      <AbsoluteAddButton
+        title="Create new category"
+        onClickFunction={() => toggleAddCategoryModal(true)}
+      />
+      <AddCategoryModal
+        open={addCategoryModal}
+        toggle={() => toggleAddCategoryModal(!addCategoryModal)}
+        onSubmit={categoryName => createNewCategory(categoryName)}
+      />
       <ErrorShowComponent
         message={message}
         status={status}
@@ -82,44 +132,6 @@ const TableComponent: React.FC = () => {
   );
 };
 
-//TODO: Add a memo to prevent rerenders after some errors
-// interface PropsTwo {
-//   data: GetAllCategoriesQuery;
-//   addItemToCategory: () => Promise<ExecutionResult<AddItemToCategoryMutation>>;
-// }
-// const Table: React.FC<PropsTwo> = React.memo(({ data, addItemToCategory }) => {
-//   const displayTableRows = (array: CategorySchema[]) =>
-//     array.map(el => (
-//       <TableRow
-//         key={el._id}
-//         addItemToArray={addItemToCategoryFunction}
-//         deleteItem={deleteItem}
-//         itemsArray={el.items}
-//         categoryName={el.categoryName}
-//       />
-//     ));
-
-//   const deleteItem = (id: string) => {
-//     // setStatusPopUp({
-//     //   message: "Delete success",
-//     //   status: true,
-//     //   show: true
-//     // });
-//     console.log("deleteItem");
-//   };
-
-//   const addItemToCategoryFunction = async () => {
-//     try {
-//       await addItemToCategory();
-//     } catch (error) {
-//       console.log(error.message);
-//     }
-//   };
-
-//   console.log("RERENDER");
-//   return <TableWrapper>{displayTableRows(data.getAllCategories)}</TableWrapper>;
-// });
-
 const Wrapper = styled.div`
   padding: 20px 0;
 `;
@@ -128,4 +140,5 @@ const TableWrapper = styled.div`
   margin: 0 auto;
   border: solid 1px ${({ theme }) => theme.color.black};
 `;
+
 export default TableComponent;
