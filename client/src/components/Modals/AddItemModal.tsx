@@ -22,6 +22,10 @@ const AddItemModal: React.FC<Props> = ({
   const classes = modalUseStyles();
   const [value, setValue] = useState("");
 
+  const sendDataHandler = () => {
+    submitData(value);
+    setValue("");
+  };
   return (
     <Modal
       className={classes.modal}
@@ -46,11 +50,12 @@ const AddItemModal: React.FC<Props> = ({
                 id="standard-basic"
                 label="Type item name"
                 onChange={e => setValue(e.target.value)}
+                autoFocus
               />
               <Button
                 variant="contained"
                 color="primary"
-                onClick={() => submitData(value)}
+                onClick={() => sendDataHandler()}
                 type="submit"
               >
                 Add

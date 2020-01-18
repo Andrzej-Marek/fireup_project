@@ -1,18 +1,30 @@
+import { useMutation } from "@apollo/react-hooks";
+import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
+import AddItemModal from "components/Modals/AddItemModal";
+import { SERVER_ERROR_MESSAGE } from "config";
+import {
+  AddItemToCategoryMutation,
+  DeleteCategoryMutation,
+  DeleteItemWithIdMutation,
+  GetAllCategoriesQuery,
+  ItemSchema
+} from "generated/graphql";
+import { GET_ALL_CATEGORIES } from "gql";
+import {
+  ADD_ITEM_TO_CATEGORY,
+  DELETE_CATEGORY,
+  DELETE_ITEM_WITH_ID
+} from "gql/Mutations";
+import { validateMinAndMaxLenght } from "MultiUse/validateMinAndMaxLenght";
 import React, { useState } from "react";
 import styled from "styled-components";
-import { ItemSchema, AddItemToCategoryMutation } from "generated/graphql";
-import AddItemModal from "components/Modals/AddItemModal";
-import { ADD_ITEM_TO_CATEGORY } from "gql/Mutations";
-import { useMutation } from "@apollo/react-hooks";
 import { IStatusPopUp } from "./TableComponent";
-import { validateMinAndMaxLenght } from "MultiUse/validateMinAndMaxLenght";
-import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
+
 const MINIMAL_ITEM_NAME_LONG = 2;
 interface Props {
   itemsArray: ItemSchema[];
   categoryName: string;
   categoryId: string;
-  deleteItem: (type: string, id: string) => void;
   setStatusPopUp: (data: IStatusPopUp) => void;
 }
 
@@ -20,22 +32,42 @@ const TableCol: React.FC<Props> = ({
   itemsArray,
   categoryName,
   categoryId,
-  deleteItem,
   setStatusPopUp
 }) => {
   const [openModal, setOpenModal] = useState(false);
   const [addItemToCategory] = useMutation<AddItemToCategoryMutation>(
     ADD_ITEM_TO_CATEGORY
   );
+  const [deleteCategory] = useMutation<DeleteCategoryMutation>(DELETE_CATEGORY);
+  const [deleteItemWithId] = useMutation<DeleteItemWithIdMutation>(
+    DELETE_ITEM_WITH_ID
+  );
 
   //Map all rows item
   const mapAllItems = () =>
     itemsArray.map(({ itemName, _id }) => (
-      <CategoryItem onClick={() => deleteItem("Category", _id)} key={_id}>
+      <CategoryItem key={_id}>
+        <div onClick={() => deleteItemHandler(_id)}>
+          <DeleteForeverIcon />
+        </div>
         {itemName}
       </CategoryItem>
     ));
 
+  const deleteItemHandler = async (itemId: string) => {
+    try {
+      await deleteItemWithId({
+        variables: { itemId },
+        refetchQueries: [{ query: GET_ALL_CATEGORIES }]
+      });
+    } catch (error) {
+      setStatusPopUp({
+        message: error?.graphQLErrors[0]?.message,
+        status: false,
+        show: true
+      });
+    }
+  };
   const submitData = async (value: string) => {
     const valueValidation = validateMinAndMaxLenght(
       value,
@@ -66,6 +98,41 @@ const TableCol: React.FC<Props> = ({
     }
   };
 
+  const deleteCategoryHandler = async (categoryId: string) => {
+    try {
+      await deleteCategory({
+        variables: { categoryId },
+        update: async cache => {
+          try {
+            let queryData = cache.readQuery<GetAllCategoriesQuery>({
+              query: GET_ALL_CATEGORIES
+            });
+            let newArray = queryData?.getAllCategories.filter(
+              el => el._id !== categoryId
+            );
+            cache.writeQuery<GetAllCategoriesQuery>({
+              query: GET_ALL_CATEGORIES,
+              data: {
+                getAllCategories: newArray as any
+              }
+            });
+          } catch (err) {
+            setStatusPopUp({
+              message: SERVER_ERROR_MESSAGE,
+              status: false,
+              show: true
+            });
+          }
+        }
+      });
+    } catch (error) {
+      setStatusPopUp({
+        message: error?.graphQLErrors[0]?.message,
+        status: false,
+        show: true
+      });
+    }
+  };
   return (
     <>
       <AddItemModal
@@ -74,10 +141,13 @@ const TableCol: React.FC<Props> = ({
         categoryName={categoryName}
         submitData={value => submitData(value)}
       />
+
       <TableColWrapper>
         <TableCategory>
           <p>{categoryName}</p>
-          <DeleteForeverIcon />
+          <DeleteForeverIcon
+            onClick={() => deleteCategoryHandler(categoryId)}
+          />
         </TableCategory>
         <TableCategoryItems>
           <>
@@ -93,25 +163,29 @@ const TableCol: React.FC<Props> = ({
 const TableColWrapper = styled.div`
   display: flex;
   align-items: center;
+  border-bottom: 1px solid ${({ theme }) => theme.color.black};
 `;
+
 const TableCategory = styled.div`
   position: relative;
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
   align-items: center;
-  width: 150px;
+  min-width: 150px;
+  max-width: 150px;
   font-weight: 700;
-  padding-left: 5px;
   overflow: hidden;
   svg {
     position: absolute;
     right: 5px;
+    cursor: pointer;
   }
 
   p {
     overflow: hidden;
     max-width: calc(100% - 40px);
+    padding-left: 5px;
   }
 `;
 
@@ -125,16 +199,46 @@ const TableCategoryItems = styled.div`
 `;
 
 const CategoryItem = styled.div`
+  position: relative;
   margin: 5px;
   padding: 5px 10px;
   min-width: 60px;
   text-align: center;
   border: 1px solid ${({ theme }) => theme.color.black};
   border-radius: 22px;
-  position: relative;
   transition: 0.5s;
+  z-index: 22;
+  overflow: hidden;
+
   :hover {
     cursor: pointer;
+    border: none;
+    border: 1px solid ${({ theme }) => theme.color.red};
+    div {
+      transform: translateY(0);
+    }
+  }
+
+  div {
+    transform: translateY(-100%);
+    transition: transform 0.4s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: ${({ theme }) => theme.color.red};
+    border-radius: 22px;
+    z-index: 1;
+
+    svg {
+      fill: ${({ theme }) => theme.color.white};
+      cursor: pointer;
+    }
   }
 `;
 
@@ -147,6 +251,7 @@ const AddButton = styled.button`
   color: ${({ theme }) => theme.color.primary};
   border-radius: 22px;
   transition: 0.3s;
+  background: transparent;
   :focus,
   :active,
   :hover {

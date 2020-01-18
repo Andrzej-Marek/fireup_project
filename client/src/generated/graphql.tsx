@@ -32,6 +32,7 @@ export type Mutation = {
   createCategory: CategorySchema,
   addItemToCategory: CategorySchema,
   deleteCategory: Scalars['Boolean'],
+  resetToDefault: Scalars['Boolean'],
   deleteItemWithId: Scalars['Boolean'],
 };
 
@@ -65,7 +66,7 @@ export type Query = {
 
 
 export type QueryGetCategoryWithItemsArgs = {
-  categoryID: Scalars['String']
+  categoryId: Scalars['String']
 };
 
 
@@ -108,6 +109,34 @@ export type CreateCategoryMutation = (
   ) }
 );
 
+export type DeleteCategoryMutationVariables = {
+  categoryId: Scalars['String']
+};
+
+
+export type DeleteCategoryMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'deleteCategory'>
+);
+
+export type DeleteItemWithIdMutationVariables = {
+  itemId: Scalars['String']
+};
+
+
+export type DeleteItemWithIdMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'deleteItemWithId'>
+);
+
+export type ResetToDefaultMutationVariables = {};
+
+
+export type ResetToDefaultMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'resetToDefault'>
+);
+
 export type GetAllCategoriesQueryVariables = {};
 
 
@@ -121,6 +150,23 @@ export type GetAllCategoriesQuery = (
       & Pick<ItemSchema, '_id' | 'itemName'>
     )> }
   )> }
+);
+
+export type GetCategoryWithItemsQueryVariables = {
+  categoryId: Scalars['String']
+};
+
+
+export type GetCategoryWithItemsQuery = (
+  { __typename?: 'Query' }
+  & { getCategoryWithItems: (
+    { __typename?: 'CategorySchema' }
+    & Pick<CategorySchema, 'categoryName' | '_id'>
+    & { items: Array<(
+      { __typename?: 'ItemSchema' }
+      & Pick<ItemSchema, 'itemName'>
+    )> }
+  ) }
 );
 
 
@@ -188,6 +234,81 @@ export function withCreateCategory<TProps, TChildProps = {}>(operationOptions?: 
 };
 export type CreateCategoryMutationResult = ApolloReactCommon.MutationResult<CreateCategoryMutation>;
 export type CreateCategoryMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateCategoryMutation, CreateCategoryMutationVariables>;
+export const DeleteCategoryDocument = gql`
+    mutation deleteCategory($categoryId: String!) {
+  deleteCategory(categoryId: $categoryId)
+}
+    `;
+export type DeleteCategoryMutationFn = ApolloReactCommon.MutationFunction<DeleteCategoryMutation, DeleteCategoryMutationVariables>;
+export type DeleteCategoryComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<DeleteCategoryMutation, DeleteCategoryMutationVariables>, 'mutation'>;
+
+    export const DeleteCategoryComponent = (props: DeleteCategoryComponentProps) => (
+      <ApolloReactComponents.Mutation<DeleteCategoryMutation, DeleteCategoryMutationVariables> mutation={DeleteCategoryDocument} {...props} />
+    );
+    
+export type DeleteCategoryProps<TChildProps = {}> = ApolloReactHoc.MutateProps<DeleteCategoryMutation, DeleteCategoryMutationVariables> & TChildProps;
+export function withDeleteCategory<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  DeleteCategoryMutation,
+  DeleteCategoryMutationVariables,
+  DeleteCategoryProps<TChildProps>>) {
+    return ApolloReactHoc.withMutation<TProps, DeleteCategoryMutation, DeleteCategoryMutationVariables, DeleteCategoryProps<TChildProps>>(DeleteCategoryDocument, {
+      alias: 'deleteCategory',
+      ...operationOptions
+    });
+};
+export type DeleteCategoryMutationResult = ApolloReactCommon.MutationResult<DeleteCategoryMutation>;
+export type DeleteCategoryMutationOptions = ApolloReactCommon.BaseMutationOptions<DeleteCategoryMutation, DeleteCategoryMutationVariables>;
+export const DeleteItemWithIdDocument = gql`
+    mutation deleteItemWithId($itemId: String!) {
+  deleteItemWithId(itemId: $itemId)
+}
+    `;
+export type DeleteItemWithIdMutationFn = ApolloReactCommon.MutationFunction<DeleteItemWithIdMutation, DeleteItemWithIdMutationVariables>;
+export type DeleteItemWithIdComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<DeleteItemWithIdMutation, DeleteItemWithIdMutationVariables>, 'mutation'>;
+
+    export const DeleteItemWithIdComponent = (props: DeleteItemWithIdComponentProps) => (
+      <ApolloReactComponents.Mutation<DeleteItemWithIdMutation, DeleteItemWithIdMutationVariables> mutation={DeleteItemWithIdDocument} {...props} />
+    );
+    
+export type DeleteItemWithIdProps<TChildProps = {}> = ApolloReactHoc.MutateProps<DeleteItemWithIdMutation, DeleteItemWithIdMutationVariables> & TChildProps;
+export function withDeleteItemWithId<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  DeleteItemWithIdMutation,
+  DeleteItemWithIdMutationVariables,
+  DeleteItemWithIdProps<TChildProps>>) {
+    return ApolloReactHoc.withMutation<TProps, DeleteItemWithIdMutation, DeleteItemWithIdMutationVariables, DeleteItemWithIdProps<TChildProps>>(DeleteItemWithIdDocument, {
+      alias: 'deleteItemWithId',
+      ...operationOptions
+    });
+};
+export type DeleteItemWithIdMutationResult = ApolloReactCommon.MutationResult<DeleteItemWithIdMutation>;
+export type DeleteItemWithIdMutationOptions = ApolloReactCommon.BaseMutationOptions<DeleteItemWithIdMutation, DeleteItemWithIdMutationVariables>;
+export const ResetToDefaultDocument = gql`
+    mutation resetToDefault {
+  resetToDefault
+}
+    `;
+export type ResetToDefaultMutationFn = ApolloReactCommon.MutationFunction<ResetToDefaultMutation, ResetToDefaultMutationVariables>;
+export type ResetToDefaultComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<ResetToDefaultMutation, ResetToDefaultMutationVariables>, 'mutation'>;
+
+    export const ResetToDefaultComponent = (props: ResetToDefaultComponentProps) => (
+      <ApolloReactComponents.Mutation<ResetToDefaultMutation, ResetToDefaultMutationVariables> mutation={ResetToDefaultDocument} {...props} />
+    );
+    
+export type ResetToDefaultProps<TChildProps = {}> = ApolloReactHoc.MutateProps<ResetToDefaultMutation, ResetToDefaultMutationVariables> & TChildProps;
+export function withResetToDefault<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  ResetToDefaultMutation,
+  ResetToDefaultMutationVariables,
+  ResetToDefaultProps<TChildProps>>) {
+    return ApolloReactHoc.withMutation<TProps, ResetToDefaultMutation, ResetToDefaultMutationVariables, ResetToDefaultProps<TChildProps>>(ResetToDefaultDocument, {
+      alias: 'resetToDefault',
+      ...operationOptions
+    });
+};
+export type ResetToDefaultMutationResult = ApolloReactCommon.MutationResult<ResetToDefaultMutation>;
+export type ResetToDefaultMutationOptions = ApolloReactCommon.BaseMutationOptions<ResetToDefaultMutation, ResetToDefaultMutationVariables>;
 export const GetAllCategoriesDocument = gql`
     query getAllCategories {
   getAllCategories {
@@ -218,3 +339,32 @@ export function withGetAllCategories<TProps, TChildProps = {}>(operationOptions?
     });
 };
 export type GetAllCategoriesQueryResult = ApolloReactCommon.QueryResult<GetAllCategoriesQuery, GetAllCategoriesQueryVariables>;
+export const GetCategoryWithItemsDocument = gql`
+    query getCategoryWithItems($categoryId: String!) {
+  getCategoryWithItems(categoryId: $categoryId) {
+    categoryName
+    _id
+    items {
+      itemName
+    }
+  }
+}
+    `;
+export type GetCategoryWithItemsComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<GetCategoryWithItemsQuery, GetCategoryWithItemsQueryVariables>, 'query'> & ({ variables: GetCategoryWithItemsQueryVariables; skip?: boolean; } | { skip: boolean; });
+
+    export const GetCategoryWithItemsComponent = (props: GetCategoryWithItemsComponentProps) => (
+      <ApolloReactComponents.Query<GetCategoryWithItemsQuery, GetCategoryWithItemsQueryVariables> query={GetCategoryWithItemsDocument} {...props} />
+    );
+    
+export type GetCategoryWithItemsProps<TChildProps = {}> = ApolloReactHoc.DataProps<GetCategoryWithItemsQuery, GetCategoryWithItemsQueryVariables> & TChildProps;
+export function withGetCategoryWithItems<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  GetCategoryWithItemsQuery,
+  GetCategoryWithItemsQueryVariables,
+  GetCategoryWithItemsProps<TChildProps>>) {
+    return ApolloReactHoc.withQuery<TProps, GetCategoryWithItemsQuery, GetCategoryWithItemsQueryVariables, GetCategoryWithItemsProps<TChildProps>>(GetCategoryWithItemsDocument, {
+      alias: 'getCategoryWithItems',
+      ...operationOptions
+    });
+};
+export type GetCategoryWithItemsQueryResult = ApolloReactCommon.QueryResult<GetCategoryWithItemsQuery, GetCategoryWithItemsQueryVariables>;

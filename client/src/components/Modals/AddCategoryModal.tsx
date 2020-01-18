@@ -23,6 +23,7 @@ const AddCategoryModal: React.FC<Props> = ({ open, toggle, onSubmit }) => {
   const submitButtonClick = () => {
     onSubmit(categoryName);
     toggle();
+    setCategoryName("");
   };
   return (
     <Modal
@@ -45,6 +46,7 @@ const AddCategoryModal: React.FC<Props> = ({ open, toggle, onSubmit }) => {
                   label="Category name"
                   value={categoryName}
                   onChange={e => setCategoryName(e.target.value)}
+                  autoFocus
                 />
               </FormGroup>
               <Button

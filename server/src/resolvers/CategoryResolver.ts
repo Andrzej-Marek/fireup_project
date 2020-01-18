@@ -1,7 +1,11 @@
-import { Resolver, Query, Mutation, Arg } from "type-graphql";
+import { defaultData } from "../config";
+import { generateSimilarItems } from "../utils";
+import { Arg, Mutation, Query, Resolver } from "type-graphql";
+import { DELETE_MESSAGE } from "../config";
 import { Category, CategorySchema, Item } from "../models";
 import { checkIfCategoryExist } from "../utils";
-import { DELETE_MESSAGE } from "../config/messages";
+
+const SIMILAR_ITEMS_COUNT = 10;
 
 @Resolver()
 export class CategoryResolver {
@@ -19,7 +23,7 @@ export class CategoryResolver {
   // Validation: Check if category exist
   @Query(() => CategorySchema)
   async getCategoryWithItems(
-    @Arg("categoryID") categoryId: string
+    @Arg("categoryId") categoryId: string
   ): Promise<CategorySchema> {
     try {
       const category = await checkIfCategoryExist(categoryId);
@@ -46,12 +50,24 @@ export class CategoryResolver {
       const category = await Category.findOne({ categoryName });
 
       if (category) {
-        return category;
+        throw new Error(`Category ${categoryName} already exist.`);
       }
 
       const newCategory = new Category({ categoryName });
+
+      const arrayWithIds = await generateSimilarItems(
+        categoryName,
+        SIMILAR_ITEMS_COUNT
+      );
+      (newCategory.items as any) = arrayWithIds;
+
       await newCategory.save();
-      return newCategory;
+
+      const populatedCategory = await newCategory
+        .populate("items")
+        .execPopulate();
+
+      return populatedCategory;
     } catch (error) {
       throw new Error(error.message);
     }
@@ -108,5 +124,31 @@ export class CategoryResolver {
     } catch (err) {
       throw new Error(err.message);
     }
+  }
+
+  @Mutation(() => Boolean)
+  async resetToDefault(): Promise<boolean> {
+    Category.deleteMany({}, err => {
+      if (err) {
+        throw new Error(err);
+      }
+    });
+    Item.deleteMany({}, err => {
+      if (err) {
+        throw new Error(err);
+      }
+    });
+
+    defaultData.forEach(async ({ categoryName, items }) => {
+      let category = new Category({ categoryName });
+      items.forEach(async ({ itemName }) => {
+        const item = new Item({ itemName });
+        category.items.push(item.id);
+        await item.save();
+      });
+
+      await category.save();
+    });
+    return true;
   }
 }

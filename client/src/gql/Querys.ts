@@ -12,3 +12,14 @@ export const GET_ALL_CATEGORIES = gql`
     }
   }
 `;
+export const GET_CATEGORY_WITH_ITEMS = gql`
+  query getCategoryWithItems($categoryId: String!) {
+    getCategoryWithItems(categoryId: $categoryId) {
+      categoryName
+      _id
+      items {
+        itemName
+      }
+    }
+  }
+`;

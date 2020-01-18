@@ -25,3 +25,21 @@ export const CREATE_CATEGORY = gql`
     }
   }
 `;
+
+export const DELETE_CATEGORY = gql`
+  mutation deleteCategory($categoryId: String!) {
+    deleteCategory(categoryId: $categoryId)
+  }
+`;
+
+export const DELETE_ITEM_WITH_ID = gql`
+  mutation deleteItemWithId($itemId: String!) {
+    deleteItemWithId(itemId: $itemId)
+  }
+`;
+
+export const RESET_TO_DEFAULT = gql`
+  mutation resetToDefault {
+    resetToDefault
+  }
+`;

@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from "@apollo/react-hooks";
 import AbsoluteAddButton from "components/Buttons/AbsoluteAddButton";
 import AddCategoryModal from "components/Modals/AddCategoryModal";
+import { SERVER_ERROR_MESSAGE } from "config";
 import {
   CategorySchema,
   CreateCategoryMutation,
@@ -13,7 +14,6 @@ import ErrorShowComponent from "MultiUse/ErrorShowComponent";
 import React, { useState } from "react";
 import styled from "styled-components";
 import TableCol from "./TableCol";
-import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 
 export interface IStatusPopUp {
   status: boolean;
@@ -27,6 +27,7 @@ const TableComponent: React.FC = () => {
     show: false
   });
   const [addCategoryModal, toggleAddCategoryModal] = useState(false);
+  const [loadingSpinner, setLoadingSpinner] = useState(false);
 
   const { loading, data } = useQuery<GetAllCategoriesQuery>(GET_ALL_CATEGORIES);
   const [addCategory] = useMutation<CreateCategoryMutation>(CREATE_CATEGORY);
@@ -34,19 +35,10 @@ const TableComponent: React.FC = () => {
   const resetStatusPopUp = () =>
     setStatusPopUp(prevState => ({ ...prevState, show: false }));
 
-  const deleteHandler = (type: string, id: string) => {
-    setStatusPopUp({
-      message: "Delete success",
-      status: true,
-      show: true
-    });
-  };
-
   const displayTableCols = (array: CategorySchema[]) =>
     array.map(({ categoryName, items, _id }) => (
       <TableCol
         key={_id}
-        deleteItem={deleteHandler}
         itemsArray={items}
         categoryName={categoryName}
         categoryId={_id}
@@ -55,6 +47,7 @@ const TableComponent: React.FC = () => {
     ));
 
   const createNewCategory = async (categoryName: string) => {
+    setLoadingSpinner(true);
     try {
       await addCategory({
         variables: { categoryName },
@@ -73,8 +66,14 @@ const TableComponent: React.FC = () => {
                 ]
               }
             });
+            setLoadingSpinner(false);
           } catch (e) {
-            console.log(e.message);
+            setStatusPopUp({
+              message: SERVER_ERROR_MESSAGE,
+              status: false,
+              show: true
+            });
+            setLoadingSpinner(false);
           }
         }
       });
@@ -111,12 +110,23 @@ const TableComponent: React.FC = () => {
   const { status, message, show } = statusPopUp;
   return (
     <Wrapper>
-      <DeleteForeverIcon onClick={() => deleteHandler("Category", "123232")} />
-      <TableWrapper>{displayTableCols(data.getAllCategories)}</TableWrapper>
+      <TableWrapper>
+        <TableHead>
+          <div className="categories">
+            <p> Categories</p>
+          </div>
+          <div className="keywords">
+            {" "}
+            <p> Keywords</p>
+          </div>
+        </TableHead>
+        {displayTableCols(data.getAllCategories)}
+      </TableWrapper>
       <AbsoluteAddButton
         title="Create new category"
         onClickFunction={() => toggleAddCategoryModal(true)}
       />
+      {loadingSpinner && <LoadingComponent />}
       <AddCategoryModal
         open={addCategoryModal}
         toggle={() => toggleAddCategoryModal(!addCategoryModal)}
@@ -138,7 +148,30 @@ const Wrapper = styled.div`
 const TableWrapper = styled.div`
   width: 900px;
   margin: 0 auto;
-  border: solid 1px ${({ theme }) => theme.color.black};
+`;
+
+const TableHead = styled.div`
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid ${({ theme }) => theme.color.black};
+  background: ${({ theme }) => theme.color.primary};
+
+  div {
+    font-weight: 700;
+    padding: 20px 0;
+    p {
+      color: white;
+    }
+  }
+  .categories {
+    width: 150px;
+    border-right: 1px solid ${({ theme }) => theme.color.black};
+    display: flex;
+    justify-content: center;
+  }
+  .keywords {
+    padding-left: 30px;
+  }
 `;
 
 export default TableComponent;

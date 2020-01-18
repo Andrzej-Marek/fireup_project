@@ -2,7 +2,7 @@ import "reflect-metadata";
 import { ApolloServer } from "apollo-server-express";
 import * as express from "express";
 import { buildSchema } from "type-graphql";
-import { dbConnect } from "./config/dbConnent";
+import { dbConnect } from "./config";
 import { CategoryResolver, ItemResovler } from "./resolvers";
 
 const main = async () => {
