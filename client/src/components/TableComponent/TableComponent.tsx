@@ -78,6 +78,7 @@ const TableComponent: React.FC = () => {
         }
       });
     } catch (error) {
+      setLoadingSpinner(false);
       setStatusPopUp({
         message: error.graphQLErrors[0].message,
         status: false,
@@ -93,7 +94,9 @@ const TableComponent: React.FC = () => {
   if (data.getAllCategories.length === 0) {
     return (
       <>
-        <h1>You don't have any categories, add one</h1>
+        <h1 data-testid="no-categories-text">
+          You don't have any categories, add one
+        </h1>
         <AbsoluteAddButton
           title="Create new category"
           onClickFunction={() => toggleAddCategoryModal(true)}

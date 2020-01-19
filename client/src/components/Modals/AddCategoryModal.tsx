@@ -47,6 +47,9 @@ const AddCategoryModal: React.FC<Props> = ({ open, toggle, onSubmit }) => {
                   value={categoryName}
                   onChange={e => setCategoryName(e.target.value)}
                   autoFocus
+                  inputProps={{
+                    "data-testid": "add-category-input"
+                  }}
                 />
               </FormGroup>
               <Button
@@ -54,6 +57,7 @@ const AddCategoryModal: React.FC<Props> = ({ open, toggle, onSubmit }) => {
                 color="primary"
                 type="submit"
                 onClick={submitButtonClick}
+                data-testid="add-category-submit-button"
               >
                 Add new category
               </Button>

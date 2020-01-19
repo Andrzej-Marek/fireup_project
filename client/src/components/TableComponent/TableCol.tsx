@@ -68,7 +68,8 @@ const TableCol: React.FC<Props> = ({
       });
     }
   };
-  const submitData = async (value: string) => {
+
+  const addItemToCateogry = async (value: string) => {
     const valueValidation = validateMinAndMaxLenght(
       value,
       MINIMAL_ITEM_NAME_LONG
@@ -139,7 +140,7 @@ const TableCol: React.FC<Props> = ({
         open={openModal}
         toggleOpen={() => setOpenModal(!openModal)}
         categoryName={categoryName}
-        submitData={value => submitData(value)}
+        submitData={value => addItemToCateogry(value)}
       />
 
       <TableColWrapper>
@@ -147,11 +148,17 @@ const TableCol: React.FC<Props> = ({
           <p>{categoryName}</p>
           <DeleteForeverIcon
             onClick={() => deleteCategoryHandler(categoryId)}
+            data-testid={categoryName + "-delete-button"}
           />
         </TableCategory>
         <TableCategoryItems>
           <>
-            <AddButton onClick={() => setOpenModal(true)}>Add +</AddButton>
+            <AddButton
+              onClick={() => setOpenModal(true)}
+              data-testid={categoryName + "-add-button"}
+            >
+              Add +
+            </AddButton>
             {mapAllItems()}
           </>
         </TableCategoryItems>

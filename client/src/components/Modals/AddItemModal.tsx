@@ -47,16 +47,19 @@ const AddItemModal: React.FC<Props> = ({
           <form onSubmit={e => e.preventDefault()}>
             <FormWrapper>
               <TextField
-                id="standard-basic"
                 label="Type item name"
                 onChange={e => setValue(e.target.value)}
                 autoFocus
+                inputProps={{
+                  "data-testid": "add-item-input"
+                }}
               />
               <Button
                 variant="contained"
                 color="primary"
                 onClick={() => sendDataHandler()}
                 type="submit"
+                data-testid="add-item-submit-button"
               >
                 Add
               </Button>

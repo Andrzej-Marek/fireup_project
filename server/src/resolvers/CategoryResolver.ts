@@ -149,6 +149,7 @@ export class CategoryResolver {
 
       await category.save();
     });
+
     return true;
   }
 }

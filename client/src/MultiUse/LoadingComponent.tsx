@@ -10,7 +10,7 @@ const Wrapper = styled.div`
 
 export const LoadingComponent: React.FC = () => {
   return (
-    <Wrapper>
+    <Wrapper data-testid="loading-spinner">
       <CircularProgress />
     </Wrapper>
   );

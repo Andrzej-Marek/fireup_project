@@ -11,7 +11,12 @@ const AbsoluteAddButton: React.FC<Props> = ({ title, onClickFunction }) => {
   return (
     <AddCategoryButtonWrapper>
       <Tooltip title={title}>
-        <Fab color="primary" aria-label="add" onClick={() => onClickFunction()}>
+        <Fab
+          data-testid="add-category-modal-toggler"
+          color="primary"
+          aria-label="add"
+          onClick={() => onClickFunction()}
+        >
           <AddIcon />
         </Fab>
       </Tooltip>

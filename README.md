@@ -1,4 +1,4 @@
-# KeyWord Manager App
+# Keyword Manager App
 
 ---
 
@@ -11,6 +11,16 @@ This is keyword manager app with tech stack:
 - TypeGraphQL
 - Typegoose
 - MongoDB
+- Jest
+- React-testing-library
+
+##### App progress:
+
+- [x] Client app
+- [x] Server app
+- [x] Querys mutations units tests
+- [ ] Table component specific units tests
+- [ ] Server units tests
 
 # Instalation
 
@@ -22,7 +32,8 @@ This is keyword manager app with tech stack:
 
    **Important**
    To run server in config folder create config file and create variables: ( mlab DB)
-   For similar words you can use [datamuse API](https://www.datamuse.com/api/)
+   For similar words you can use [datamuse API](https://www.datamuse.com/api/).
+   Or contact with me to get `config.ts` file.
 
 | Variable name          | Type                                  | Required |
 | ---------------------- | :------------------------------------ | :------: |
