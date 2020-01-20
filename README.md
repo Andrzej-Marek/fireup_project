@@ -2,7 +2,9 @@
 
 ---
 
-This is keyword manager app with tech stack:
+This is keyword manager fullstack app. With similar words generator. You can create and delete categories and add items to it.
+
+##### Tech stack:
 
 - React
 - Typescript
