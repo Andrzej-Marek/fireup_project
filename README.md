@@ -42,3 +42,7 @@ This is keyword manager app with tech stack:
 | DB_USER_PASSWORD       | String: DB user password              |   True   |
 | DB_HOST                | String: DB host                       |   True   |
 | SIMILAR_WORDS_ENDPOINT | String: endpoint for similar word api |   True   |
+
+### Testing
+
+To test aplication just go to folder ( client or server ) and run command npm run test
