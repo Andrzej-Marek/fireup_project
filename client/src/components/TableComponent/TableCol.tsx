@@ -70,18 +70,6 @@ const TableCol: React.FC<Props> = ({
   };
 
   const addItemToCateogry = async (value: string) => {
-    const valueValidation = validateMinAndMaxLenght(
-      value,
-      MINIMAL_ITEM_NAME_LONG
-    );
-
-    if (!valueValidation) {
-      return setStatusPopUp({
-        message: `Item name have to be at least ${MINIMAL_ITEM_NAME_LONG} characters`,
-        status: false,
-        show: true
-      });
-    }
     try {
       await addItemToCategory({ variables: { categoryId, itemName: value } });
       setOpenModal(false);

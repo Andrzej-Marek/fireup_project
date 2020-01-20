@@ -4,6 +4,7 @@ export const validateMinAndMaxLenght = (
   maxLenght: number = 50
 ) => {
   const stringLength = string.trim().length;
+
   if (stringLength < minLenght || stringLength > maxLenght) {
     return false;
   }

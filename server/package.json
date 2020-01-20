@@ -6,18 +6,24 @@
   "scripts": {
     "start": "ts-node src/index.ts",
     "dev": "nodemon --exec ts-node src/index.ts",
-    "start-both": "concurrently \"cd .. && cd client && npm start\" \"npm start\""
+    "start-both": "concurrently \"cd .. && cd client && npm start\" \"npm start\"",
+    "test": "jest --detectOpenHandles"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@shelf/jest-mongodb": "^1.1.3",
     "@types/express": "^4.17.2",
     "@types/graphql": "^14.5.0",
+    "@types/jest": "^24.9.0",
     "@types/mongoose": "^5.5.41",
     "@types/node": "^13.1.7",
     "concurrently": "^5.0.2",
+    "jest": "^24.9.0",
+    "mongodb-memory-server": "^6.2.2",
     "nodemon": "^2.0.2",
+    "ts-jest": "^24.3.0",
     "ts-node": "^8.6.2",
     "typescript": "^3.7.4"
   },
@@ -25,6 +31,7 @@
     "@typegoose/typegoose": "^6.2.1",
     "apollo-server-express": "^2.9.16",
     "axios": "^0.19.1",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "graphql": "^14.5.8",
     "mongoose": "^5.8.7",

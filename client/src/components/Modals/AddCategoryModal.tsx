@@ -6,10 +6,11 @@ import {
   TextField,
   Button
 } from "@material-ui/core";
-import { MODAL_BACKDROP_SHOW_DOWN_TIME } from "config";
+import { MODAL_BACKDROP_SHOW_DOWN_TIME, MIN_CATEGORY_LENGHT } from "config";
 import { ModalFade } from "./ModalFade";
 import { FormWrapper, ModalWrapper, modalUseStyles } from "assets/styles";
-
+import { ErrorShow } from "assets/styles/ErrorShow";
+import { validateMinAndMaxLenght } from "MultiUse/validateMinAndMaxLenght";
 interface Props {
   open: boolean;
   toggle: () => void;
@@ -18,18 +19,30 @@ interface Props {
 
 const AddCategoryModal: React.FC<Props> = ({ open, toggle, onSubmit }) => {
   const [categoryName, setCategoryName] = useState("");
+  const [error, setError] = useState<null | string>(null);
   const classes = modalUseStyles();
 
   const submitButtonClick = () => {
+    if (!validateMinAndMaxLenght(categoryName, MIN_CATEGORY_LENGHT)) {
+      return setError(
+        `Category name should be at least ${MIN_CATEGORY_LENGHT} characters long`
+      );
+    }
     onSubmit(categoryName);
+    togleFunction();
+    setCategoryName("");
+  };
+
+  const togleFunction = () => {
     toggle();
     setCategoryName("");
+    setError(null);
   };
   return (
     <Modal
       className={classes.modal}
       open={open}
-      onClose={toggle}
+      onClose={togleFunction}
       closeAfterTransition
       BackdropComponent={Backdrop}
       BackdropProps={{
@@ -50,7 +63,9 @@ const AddCategoryModal: React.FC<Props> = ({ open, toggle, onSubmit }) => {
                   inputProps={{
                     "data-testid": "add-category-input"
                   }}
+                  error={!!error}
                 />
+                <ErrorShow>{error && error}</ErrorShow>
               </FormGroup>
               <Button
                 variant="contained"
